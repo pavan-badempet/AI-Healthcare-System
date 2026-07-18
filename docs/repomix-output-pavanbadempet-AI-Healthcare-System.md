@@ -585,9 +585,9 @@ tests/
   integration/
     test_api_endpoints.py
     test_api.py
-    test_clinos_federated_sync.py
-    test_clinos_intelligence.py
-    test_clinos_smart_fhir.py
+    test_AI Healthcare System_federated_sync.py
+    test_AI Healthcare System_intelligence.py
+    test_AI Healthcare System_smart_fhir.py
   unit/
     test_abdm.py
     test_admin_and_ops.py
@@ -617,7 +617,7 @@ tests/
     test_clinical_agent.py
     test_clinical_indices.py
     test_clinical_workflows.py
-    test_clinos_event_bus.py
+    test_AI Healthcare System_event_bus.py
     test_compliance_privacy.py
     test_core_ai_inference.py
     test_core_ai_security.py
@@ -7128,7 +7128,7 @@ def downgrade() -> None:
 
 ## File: backend/migrations/versions/b9182d60f4a1_adopt_current_application_schema.py
 ````python
-"""Add soft-delete fields and ClinOS domain tables.
+"""Add soft-delete fields and AI Healthcare System domain tables.
 
 Revision ID: b9182d60f4a1
 Revises: a43c2f91d7b0
@@ -7172,7 +7172,7 @@ def _index_names(inspector: sa.Inspector, table_name: str) -> set[str]:
     }
 
 
-def _create_clinos_tables(existing_tables: set[str]) -> None:
+def _create_AI Healthcare System_tables(existing_tables: set[str]) -> None:
     if "smart_apps" not in existing_tables:
         op.create_table(
             "smart_apps",
@@ -7412,7 +7412,7 @@ def upgrade() -> None:
         if index_name not in _index_names(inspector, table_name):
             op.create_index(index_name, table_name, ["is_deleted"])
 
-    _create_clinos_tables(existing_tables)
+    _create_AI Healthcare System_tables(existing_tables)
 
 
 def downgrade() -> None:
@@ -18812,7 +18812,7 @@ async def generate_patient_insights(
         patient_id=patient_id,
         insight_type="risk_summary",
         content=json.dumps(insight_content),
-        model_version="clinos-intelligence-v1",
+        model_version="AI Healthcare System-intelligence-v1",
     )
     db.add(db_insight)
     db.commit()
@@ -25575,7 +25575,7 @@ def init_enterprise_features(app):
 
 ## File: backend/event_bus.py
 ````python
-"""Clinical Event Bus — async pub/sub for ClinOS domain events.
+"""Clinical Event Bus — async pub/sub for AI Healthcare System domain events.
 
 Provides topic-based routing for clinical events (vitals, diagnostics,
 admissions, care events).  Uses in-memory asyncio queues by default and
@@ -25679,7 +25679,7 @@ class ClinicalEventBus:
         """Publish an event.
 
         In Redis mode the payload is added to a Redis Stream keyed by
-        ``clinos:events:{topic}``.  Otherwise it is enqueued locally.
+        ``AI Healthcare System:events:{topic}``.  Otherwise it is enqueued locally.
 
         Args:
             topic: The event topic string.
@@ -25689,7 +25689,7 @@ class ClinicalEventBus:
             try:
                 import json
 
-                stream_key = f"clinos:events:{topic}"
+                stream_key = f"AI Healthcare System:events:{topic}"
                 await self._redis.xadd(stream_key, {"payload": json.dumps(payload)})
                 logger.debug("Published to Redis stream '%s'", stream_key)
                 # Also dispatch locally so in-process subscribers still fire.
@@ -25754,7 +25754,7 @@ class ClinicalEventBus:
         """Background loop reading new entries from Redis Streams."""
         import json
 
-        streams = {f"clinos:events:{t}": "$" for t in ALL_TOPICS}
+        streams = {f"AI Healthcare System:events:{t}": "$" for t in ALL_TOPICS}
 
         try:
             while True:
@@ -25766,7 +25766,7 @@ class ClinicalEventBus:
                     continue
 
                 for stream_key, messages in results:
-                    topic = stream_key.replace("clinos:events:", "")
+                    topic = stream_key.replace("AI Healthcare System:events:", "")
                     for msg_id, fields in messages:
                         try:
                             payload = json.loads(fields.get("payload", "{}"))
@@ -38068,7 +38068,7 @@ async def handle_vitals_recorded(payload: dict) -> None:
                     patient_id=patient_id,
                     event_type="DIAGNOSTIC_ALERT",
                     title="Diabetes Risk Flagged",
-                    summary=f"Automated ClinOS intelligence flagged high diabetes risk ({round(diabetes_risk * 100, 1)}%) based on recent vital logs.",
+                    summary=f"Automated AI Healthcare System intelligence flagged high diabetes risk ({round(diabetes_risk * 100, 1)}%) based on recent vital logs.",
                     severity="warning",
                 ))
                 db.commit()
@@ -38110,7 +38110,7 @@ async def handle_vitals_recorded(payload: dict) -> None:
                     patient_id=patient_id,
                     event_type="DIAGNOSTIC_ALERT",
                     title="Cardiovascular Risk Flagged",
-                    summary=f"Automated ClinOS intelligence flagged high cardiovascular risk ({round(heart_risk * 100, 1)}%) based on recent vital logs.",
+                    summary=f"Automated AI Healthcare System intelligence flagged high cardiovascular risk ({round(heart_risk * 100, 1)}%) based on recent vital logs.",
                     severity="critical",
                 ))
                 db.commit()
@@ -61295,7 +61295,7 @@ export const intelligenceItems: MenuItem[] = [
   },
 ];
 
-export const clinosItems: MenuItem[] = [
+export const AI Healthcare SystemItems: MenuItem[] = [
   {
     id: "smart_app_registry",
     title: "App Registry",
@@ -61373,10 +61373,10 @@ export const COMMAND_ITEMS = [
   { label: "Pricing & API Billing Details", href: "/pricing", category: "Intelligence", desc: "Hospital pricing plans and usage details", icon: CreditCard },
   { label: "User Profile Settings", href: "/profile", category: "Account", desc: "View your user name, email, and preferences", icon: Settings },
   { label: "Administrative Tools Panel", href: "/admin", category: "Admin", desc: "Doctor credentials, audit logs, and security levels", icon: ShieldCheck },
-  { label: "SMART App Registry", href: "/apps", category: "ClinOS", desc: "Register and launch third-party SMART apps", icon: Plug },
-  { label: "Federated Privacy Mesh", href: "/federated", category: "ClinOS", desc: "Privacy-preserving distributed model sync bridge", icon: ShieldCheck },
-  { label: "Clinical Intelligence Command Center", href: "/intelligence", category: "ClinOS", desc: "Real-time vitals alerts and explainable AI SHAP report", icon: BrainCircuit },
-  { label: "Aura Health Companion", href: "/companion", category: "ClinOS", desc: "Warm symptom tracker, flare diary, and empathetic AI companion", icon: Smile },
+  { label: "SMART App Registry", href: "/apps", category: "AI Healthcare System", desc: "Register and launch third-party SMART apps", icon: Plug },
+  { label: "Federated Privacy Mesh", href: "/federated", category: "AI Healthcare System", desc: "Privacy-preserving distributed model sync bridge", icon: ShieldCheck },
+  { label: "Clinical Intelligence Command Center", href: "/intelligence", category: "AI Healthcare System", desc: "Real-time vitals alerts and explainable AI SHAP report", icon: BrainCircuit },
+  { label: "Aura Health Companion", href: "/companion", category: "AI Healthcare System", desc: "Warm symptom tracker, flare diary, and empathetic AI companion", icon: Smile },
 ];
 
 /* ───────────────────────────────────────────────────
@@ -61411,11 +61411,11 @@ export const MENU_GROUPS: MenuGroup[] = [
     routes: ["/chat", "/about", "/pricing"],
   },
   {
-    key: "clinos",
-    label: "ClinOS",
+    key: "AI Healthcare System",
+    label: "AI Healthcare System",
     emoji: "🚀",
     accentColor: "text-sky-400 data-[state=open]:text-sky-400",
-    items: clinosItems,
+    items: AI Healthcare SystemItems,
     cols: 2,
     routes: ["/apps", "/federated", "/intelligence", "/companion"],
   },
@@ -62224,7 +62224,7 @@ import Tooltip from "./Tooltip";
 import { useTranslation } from "@/lib/i18n";
 import {
   type MenuItem, type MenuGroup,
-  operationsItems, diagnosticsItems, intelligenceItems, clinosItems,
+  operationsItems, diagnosticsItems, intelligenceItems, AI Healthcare SystemItems,
   MENU_GROUPS, getIconStyles, colorKeyFromMenuItem,
   COMMAND_ITEMS,
 } from "./nav-config";
@@ -62276,7 +62276,7 @@ export default function TopNav({
     return item;
   });
 
-  const dynamicClinosItems = clinosItems.map(item => {
+  const dynamicAI Healthcare SystemItems = AI Healthcare SystemItems.map(item => {
     return item;
   });
 
@@ -62309,11 +62309,11 @@ export default function TopNav({
       routes: ["/chat", "/about", "/pricing"],
     },
     {
-      key: "clinos",
-      label: language === "es" ? "Sistemas ClinOS" : language === "hi" ? "क्लिओएस" : "ClinOS",
+      key: "AI Healthcare System",
+      label: language === "es" ? "Sistemas AI Healthcare System" : language === "hi" ? "क्लिओएस" : "AI Healthcare System",
       emoji: "🚀",
       accentColor: "text-sky-400 data-[state=open]:text-sky-400",
-      items: dynamicClinosItems,
+      items: dynamicAI Healthcare SystemItems,
       cols: 2,
       routes: ["/apps", "/federated", "/intelligence", "/companion"],
     },
@@ -72154,7 +72154,7 @@ export default function ClinicalIntelligence() {
           summary: 'Patient records analyzed. SpO2 and Heart Rate demonstrate stable baselines. Consider monitoring blood pressure levels.',
           vital_summary: 'Heart Rate: 72 bpm, Blood Pressure: 120/80 mmHg, SpO2: 98%'
         },
-        model_version: 'clinos-fallback',
+        model_version: 'AI Healthcare System-fallback',
         created_at: new Date().toISOString()
       });
       setExplainability({
@@ -73230,7 +73230,7 @@ export default function ClinicalIntelligence() {
                 )}
               </div>
 
-              {/* ClinOS Security Compliance */}
+              {/* AI Healthcare System Security Compliance */}
               <div className="p-3 bg-indigo-500/5 border border-indigo-500/15 rounded-2xl flex items-start gap-2.5 flex-shrink-0">
                 <ShieldAlert className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
                 <span className="text-[9px] leading-relaxed text-indigo-300/80 font-mono">
@@ -95650,9 +95650,9 @@ def test_full_lifecycle(client):
     assert len(res.json()) == 0
 ````
 
-## File: tests/integration/test_clinos_federated_sync.py
+## File: tests/integration/test_AI Healthcare System_federated_sync.py
 ````python
-"""ClinOS Federated Sync Bridge integration tests.
+"""AI Healthcare System Federated Sync Bridge integration tests.
 
 Tests clinician feedback submission, Laplace DP noise injection,
 sync audit logging, and privacy budget exhaustion guard.
@@ -95665,7 +95665,7 @@ import pytest
 
 os.environ.setdefault("TESTING", "1")
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
-os.environ.setdefault("SECRET_KEY", "test-secret-key-clinos")
+os.environ.setdefault("SECRET_KEY", "test-secret-key-AI Healthcare System")
 
 
 @pytest.fixture
@@ -95772,9 +95772,9 @@ def test_federated_audit_history(client, auth_headers):
         assert "epsilon_consumed" in audits[0]
 ````
 
-## File: tests/integration/test_clinos_intelligence.py
+## File: tests/integration/test_AI Healthcare System_intelligence.py
 ````python
-"""ClinOS Clinical Intelligence integration tests.
+"""AI Healthcare System Clinical Intelligence integration tests.
 
 Tests the alert engine, acknowledgement workflow, patient insights,
 and explainability feature importance responses.
@@ -95787,7 +95787,7 @@ import pytest
 
 os.environ.setdefault("TESTING", "1")
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
-os.environ.setdefault("SECRET_KEY", "test-secret-key-clinos")
+os.environ.setdefault("SECRET_KEY", "test-secret-key-AI Healthcare System")
 
 
 @pytest.fixture
@@ -95865,9 +95865,9 @@ def test_explainability_mock(client, auth_headers):
     assert isinstance(data["feature_importances"], dict)
 ````
 
-## File: tests/integration/test_clinos_smart_fhir.py
+## File: tests/integration/test_AI Healthcare System_smart_fhir.py
 ````python
-"""ClinOS SMART on FHIR integration tests.
+"""AI Healthcare System SMART on FHIR integration tests.
 
 Tests the SMART app registry CRUD, launch context generation,
 and FHIR scope-guard middleware.
@@ -95880,7 +95880,7 @@ import pytest
 
 os.environ.setdefault("TESTING", "1")
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
-os.environ.setdefault("SECRET_KEY", "test-secret-key-clinos")
+os.environ.setdefault("SECRET_KEY", "test-secret-key-AI Healthcare System")
 
 
 @pytest.fixture
@@ -102791,9 +102791,9 @@ def test_pharmacy_resolve_facility_mismatch_raises():
     assert exc.value.status_code == 400
 ````
 
-## File: tests/unit/test_clinos_event_bus.py
+## File: tests/unit/test_AI Healthcare System_event_bus.py
 ````python
-"""ClinOS Event Bus unit tests.
+"""AI Healthcare System Event Bus unit tests.
 
 Tests the in-memory publish/subscribe pattern of the ClinicalEventBus.
 """
