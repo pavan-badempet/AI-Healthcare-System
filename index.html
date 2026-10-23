@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Primary SEO Metadata -->
+    <title>AI Healthcare System — Open-Source Clinical Intelligence, TabICLv2 Foundation Model & Databricks Lakehouse</title>
+    <meta name="title" content="AI Healthcare System — Open-Source Clinical Intelligence, TabICLv2 Foundation Model & Databricks Lakehouse" />
+    <meta name="description" content="Planetary-scale open-source clinical intelligence platform featuring TabICLv2 foundation models, Databricks Delta Lakehouse (OMOP CDM v5.4), 10-year multi-organ digital twin ODE simulations, and CPIC pharmacogenomics." />
+    <meta name="keywords" content="clinical AI, TabICL, TabICLv2, tabular foundation model, Databricks healthcare lakehouse, Delta Lake, OMOP CDM v5.4, FHIR R4, open source EHR, clinical decision support system CDSS, 10-year digital twin, CPIC pharmacogenomics, conformal prediction, medical AI, HIPAA compliant AI, PySpark MLlib, DICOM PACS" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="author" content="Pavan Badempet" />
+    <meta name="theme-color" content="#090a0f" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="ClinOS" />
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="AI Healthcare System — Open-Source Clinical Intelligence & Databricks Lakehouse" />
+    <meta property="og:description" content="Planetary-scale open-source clinical intelligence platform featuring TabICLv2 foundation models, Databricks Delta Lakehouse (OMOP CDM v5.4), 10-year multi-organ digital twin ODE simulations, and CPIC pharmacogenomics." />
+    <meta property="og:site_name" content="AI Healthcare System" />
+
+    <!-- Favicon, Apple Touch Icon & PWA Manifest -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <script>
+      (function () {
+        window.addEventListener(
+          'unhandledrejection',
+          function (event) {
+            var msg = event && event.reason && (event.reason.message || String(event.reason));
+            if (msg && msg.indexOf('WebSocket closed without opened') !== -1) {
+              event.preventDefault();
+              event.stopImmediatePropagation();
+            }
+          },
+          true
+        );
+        var NativeWebSocket = window.WebSocket;
+        if (NativeWebSocket) {
+          var WrappedWebSocket = function (url, protocols) {
+            var isViteHmr =
+              protocols === 'vite-hmr' ||
+              protocols === 'vite-ping' ||
+              (Array.isArray(protocols) &&
+                (protocols.indexOf('vite-hmr') !== -1 || protocols.indexOf('vite-ping') !== -1));
+            if (isViteHmr) {
+              var dummy = new EventTarget();
+              dummy.readyState = 1;
+              dummy.send = function () {};
+              dummy.close = function () {};
+              dummy.bufferedAmount = 0;
+              dummy.extensions = '';
+              dummy.protocol = typeof protocols === 'string' ? protocols : 'vite-hmr';
+              dummy.url = String(url || '');
+              dummy.binaryType = 'blob';
+              setTimeout(function () {
+                var openEvt = new Event('open');
+                if (typeof dummy.onopen === 'function') dummy.onopen(openEvt);
+                dummy.dispatchEvent(openEvt);
+              }, 0);
+              return dummy;
+            }
+            return protocols !== undefined
+              ? new NativeWebSocket(url, protocols)
+              : new NativeWebSocket(url);
+          };
+          WrappedWebSocket.prototype = NativeWebSocket.prototype;
+          WrappedWebSocket.CONNECTING = NativeWebSocket.CONNECTING;
+          WrappedWebSocket.OPEN = NativeWebSocket.OPEN;
+          WrappedWebSocket.CLOSING = NativeWebSocket.CLOSING;
+          WrappedWebSocket.CLOSED = NativeWebSocket.CLOSED;
+          window.WebSocket = WrappedWebSocket;
+        }
+      })();
+    </script>
+  </head>
+  <body class="bg-[#020204] text-slate-100 antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

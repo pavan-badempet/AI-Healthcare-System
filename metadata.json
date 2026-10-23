@@ -1,0 +1,11 @@
+{
+  "name": "AI Healthcare System",
+  "description": "Planetary-scale open-source clinical intelligence platform featuring TabICLv2 foundation models, Databricks Delta Lakehouse (OMOP CDM v5.4), 10-year multi-organ digital twin ODE simulations, and CPIC pharmacogenomics.",
+  "permissions": [
+    "camera",
+    "microphone"
+  ],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

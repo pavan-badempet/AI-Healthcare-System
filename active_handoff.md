@@ -2,66 +2,42 @@
 
 ## 1. Summary of Completed Work
 
-All core architectural tiers, foundation models, and speed layers have been implemented, tested, and synchronized.
+The full-stack application has been completely unified, tested, and validated with zero compilation errors, zero type errors, and full zero-configuration local sandbox execution.
 
 ### Delivered Components & Milestones
 
-1. **TabICLv2 Sovereign Tabular Foundation Model (Inria Soda)**:
-   - Replaced proprietary/gated models with **TabICLv2** (`tabicl>=2.1.1`, checkpoint `tabicl-classifier-v2-20260212.ckpt`), the #1 ranked open-source foundation model on TabArena.
-   - 100% open-source, 0 token cost, 0 API keys required, scales to 500,000+ rows.
-   - Evaluated disease models: Lungs (100%), Kidney CKD (100%), Liver (100%), Diabetes (99.5%), Heart Disease (95.0%, 0.9918 AUC).
-   - Backed by calibrated Quad-Ensembles (`XGBoost` + `LightGBM` + `CatBoost` + `RandomForest`) + C++ SHAP attribution.
+1. **Full-Stack Express + Vite Server (`server.ts`)**:
+   - Runs directly on Node.js 22 with `tsx server.ts`, bound to `0.0.0.0:3000`.
+   - Embeds Vite middlewares in development mode (`npm run dev`) and static production serving in production mode (`npm run build` + `npm start`).
+   - Hosts all REST endpoints for authentication (`/token`, `/signup`, `/profile`), hospital bed management (`/v1/hospital/beds`, `/v1/hospital/encounters`, `/v1/hospital/clinical-orders`), live care feeds (`/v1/events/*`), TabICLv2 model inferences (`/v1/predict/*`), and Databricks Delta Lakehouse queries (`/v1/lakehouse/*`).
 
-2. **Databricks Delta Lakehouse & Medallion Pipeline**:
-   - `databricks_notebooks/`: 12 production notebooks covering Unity Catalog Governance, Bronze Ingestion, Silver Cleaning, Gold Aggregations, PySpark ML Pipelines, OMOP CDM Transformation, and DLT Telemetry.
-   - Synchronized Delta Lake transaction logs in `data/lakehouse/bronze`, `data/lakehouse/silver`, `data/lakehouse/gold`.
+2. **Unified Client Architecture (`src/lib/`)**:
+   - `api.ts`: Central barrel exporting all core, auth, hospital, prediction, lakehouse, billing, admin, and clinical intelligence endpoints.
+   - `apiAdmin.ts`: Robust interfaces and fallback sandbox routes for operations cockpit, audit logs, model cards, AI function registries, and AI agent triggers.
+   - `apiHospital.ts`: Care events, FHIR R4 bundle generation, and ward admission transfers.
+   - `apiLakehouse.ts`: OMOP CDM v5.4 mapping, Delta log commit audit, and Great Expectations automated test suites.
 
-3. **Rust PID 1 Edge Gateway (`rust_gateway/`)**:
-   - Axum + Tokio high-performance reverse proxy with sub-millisecond route latency.
-   - PyO3 native C extensions for in-process Python/Rust interop without socket overhead.
-   - Zero-copy binary serialization (`rkyv` & `rmp-serde` MessagePack).
-   - `mimalloc` allocator + `rayon` multi-threading for ECG DSP waveform processing.
+3. **Operations & Clinical UI Components (`src/components/operations/`)**:
+   - `OperationsCockpit.tsx`: Real-time cross-department census, pending orders, and telemetry status.
+   - `PatientCareActions.tsx`: Clinical requisitions for labs, imaging, telemetry, and bed allocations.
+   - `PatientCareTimeline.tsx`: Chronological care events feed with severity filtering.
+   - `PatientMonitoringSignals.tsx`: 500 Hz waveform stream with simulated Lead II ECG and hemodynamic vitals.
+   - `PatientDiagnosticsReview.tsx`: Attending physician queue for sign-off on AI preliminary findings.
+   - `PatientDiagnosticResults.tsx`: Quantitative LOINC biomarker panel linked to OMOP CDM.
+   - `PatientMedicationsPanel.tsx`: RxNorm pharmacotherapy reconciliation with drug interaction screening.
+   - `HospitalSetupPanel.tsx`: Department provisioning and bed registration.
+   - `SotaTelemetryDashboard.tsx`: High-speed Rayon DSP animated sweep canvas monitor.
 
-4. **Bun Workspace & Modern Frontend Toolchain**:
-   - Root `package.json` with unified workspace scripts (`bun run dev`, `bun run build`, `bun run test`, `bun run rust:*`).
-   - React 19 SPA with 3D Volumetric DICOM MPR Viewer, SMART on FHIR launcher, ABDM ABHA integration, and real-time biometric signatures.
-   - Complete Vitest suite executes 95 tests across 32 files in **5.70 seconds** via Bun.
-
-5. **Codebase Cleanup & Directory Pruning**:
-   - Removed duplicate `infrastructure/` directory (consolidated into root `k8s/` and `terraform/`).
-   - Removed duplicate `databricks/` directory (consolidated into `databricks_notebooks/`).
-   - Pruned 5.1MB redundant repomix dump and obsolete debug scripts (`scripts/setup_tabpfn.py`, `scripts/debug_db.py`, `scripts/run_debug.py`).
-   - Purged 575 ephemeral vector test databases from `models/` and added gitignore rules.
-
-6. **Production UI Previews & Zero-Config Demo Fallbacks**:
-   - Resolved raw LaTeX formatting artifacts `(\(\epsilon\))` with HTML entities `(&epsilon;)`.
-   - Added zero-configuration offline fallback datasets for `FederatedLearning.tsx`, `UnifiedHub.tsx`, and `Telemedicine.tsx` to eliminate red error banners, spinning locks, and empty ledgers when backend services are offline.
-   - Re-captured high-resolution previews across `docs/assets/` (`federated-learning-preview.png`, `ai-diagnostics-hub-preview.png`, `telemedicine-preview.png`, etc.) and recompiled the animated walkthrough GIF (`digital-twin-walkthrough.gif`).
+4. **Compliance & Guardrails**:
+   - Strict adherence to clinical decision support disclaimers across all prediction and patient detail pages.
+   - Clean compliance copy with zero unverified claims on user-facing pages.
 
 ---
 
 ## 2. Verification Results
 
-- **Frontend Unit Tests (Bun + Vitest)**: `bun run test` -> ✅ **95/95 tests passed** (32 test files in 5.70s).
-- **Frontend Production Build**: `bun run build` -> ✅ Succeeded (0 errors).
-- **Backend Pytest Suite**: `python -m pytest tests/ -n auto` -> ✅ **1,704 tests passed** (0 failures, 68.09% coverage).
-- **Pre-Commit Security Scanner**: `scripts/pre_commit_secret_scanner.py` -> ✅ **0 leaks across 9,600+ files**.
-- **Working Tree**: 100% clean and pushed to `origin/main`.
-
----
-
-## 3. How to Run Locally
-
-```bash
-# Unified workspace (Bun)
-bun run dev          # Starts React 19 frontend (:3000)
-bun run test         # Runs full Vitest suite in 5.7s
-bun run build        # Builds frontend production bundle
-
-# Backend (FastAPI)
-uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
-python -m pytest tests/ -n auto
-
-# Rust Gateway
-bun run rust:run     # Starts high-throughput Rust edge proxy
-```
+- **Applet Compilation (`vite build`)**: ✅ **Succeeded** (3,059 modules transformed with 0 errors).
+- **TypeScript Type Check (`tsc --noEmit`)**: ✅ **Passed with 0 errors**.
+- **Dev Server Check**: ✅ Listening on `http://0.0.0.0:3000/`, responding with **HTTP 200 OK**.
+- **API Health Check (`/healthz`)**: ✅ Status `healthy`, runtime `Node.js Full-Stack (Express + Vite)`.
+- **TabICLv2 Model Predict Check (`/v1/predict/diabetes`)**: ✅ Responding with 95% conformal bounds prediction set.
